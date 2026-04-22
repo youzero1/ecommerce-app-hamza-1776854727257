@@ -7,19 +7,25 @@ import { sampleProducts, sampleCategories } from '@/lib/sample-data';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Product } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   let products: Product[] = sampleProducts;
 
-  const supabase = getSupabaseClient();
-  if (supabase) {
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(8);
-    if (data && data.length > 0) {
-      products = data as Product[];
+  try {
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(8);
+      if (data && data.length > 0) {
+        products = data as Product[];
+      }
     }
+  } catch (e) {
+    // Supabase not configured, use sample data
   }
 
   const featuredProducts = products.slice(0, 8);
